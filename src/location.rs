@@ -4,16 +4,15 @@ use dbus;
 
 const TIMEOUT: i32 = 10; // miliseconds?
 const DESTINATION: &'static str = "org.freedesktop.Geoclue.Master";
-// client0, 1, 2, or 3 on my computer
-// client0 doesn't seem to have the ability to get position information, only address info
-// aside from that, they all seem identical
 const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client1";
+// client0, 1, 2, or 3 on my computer. client0 doesn't seem to have the ability to get
+// position information, only address info. Aside from that, they all seem identical
 
 
 #[derive(Debug, Serialize)]
-pub struct Location {
-    country:     Option<String>,
-    postalcode:  Option<String>,
+pub struct Location {            // Wrapping every field in Option makes it more flexible.
+    country:     Option<String>, // Can encode it as JSON even if some fields are
+    postalcode:  Option<String>, // missing
     region:      Option<String>,
     timezone:    Option<String>,
     locality:    Option<String>,
@@ -21,10 +20,9 @@ pub struct Location {
     lat_lon:     Option<(f64, f64)>,
 }
 
+#[allow(dead_code)]
 impl Location {
-    #![allow(dead_code)]
-
-    // Query the D-Bus for our position
+    // Query the D-Bus for address
     pub fn get_address(c: &dbus::Connection) -> Result<Self, String> {
 
         let interface = "org.freedesktop.Geoclue.Address";
@@ -36,7 +34,7 @@ impl Location {
         // awkward argument parsing
         let (_time, mut location): (i32, HashMap<String, String>) = response.read2()
                                                                        .unwrap_or((0, HashMap::new()));
-        Ok(Location { // take values from the HashMap
+        Ok(Location { // take values out from the HashMap
             country:     location.remove("country"), // Option<String>
             postalcode:  location.remove("postalcode"),
             region:      location.remove("region"),
@@ -47,7 +45,7 @@ impl Location {
         })
     }
 
-    // pub fn get_position(c: &dbus::Connection) {
+    // Query the D-Bus for position
     pub fn get_position(c: &dbus::Connection) -> Result<Self, String> {
         let interface = "org.freedesktop.Geoclue.Position";
         let method = "GetPosition";
@@ -73,8 +71,9 @@ impl Location {
         serde_json::to_string(self)
     }
 
-    pub fn merge(mut self, other: Self) -> Self { // if the other struct contains fields we don't
-        if other.country.is_some() {              // have, overwrite those in this struct
+    // if the other struct contains a field, overwrite it in this struct
+    pub fn merge(mut self, other: Self) -> Self {
+        if other.country.is_some() {
             self.country = other.country;
         }
         if other.postalcode.is_some() {
@@ -102,7 +101,7 @@ impl Location {
 fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Message, String> {
     match c.send_with_reply_and_block(msg, TIMEOUT) {
         Ok(r)  => Ok(r),
-        Err(e) => { // different methods don't return the same error type of course
+        Err(e) => { // convert to the same error type as Message::new_method_call could return
             Err(format!("{}: {}", e.name().unwrap_or("NO_NAME"),
                                   e.message().unwrap_or("NO_MESSAGE")))
         },
