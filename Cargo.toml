@@ -1,0 +1,10 @@
+[package]
+name = "geosnitch"
+version = "0.1.0"
+authors = ["Jacob Killelea <Jkillelea@protonmail.ch>"]
+
+[dependencies]
+dbus = "0.6.1"
+serde = "*"
+serde_json = "*"
+serde_derive = "*"
