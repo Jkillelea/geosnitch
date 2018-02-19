@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::collections::HashMap;
 use serde_json;
 use dbus;
@@ -20,7 +21,6 @@ pub struct Location {            // Wrapping every field in Option makes it more
     lat_lon:     Option<(f64, f64)>,
 }
 
-#[allow(dead_code)]
 impl Location {
     // Query the D-Bus for address
     pub fn get_address(c: &dbus::Connection) -> Result<Self, String> {
@@ -105,5 +105,42 @@ fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Messa
             Err(format!("{}: {}", e.name().unwrap_or("NO_NAME"),
                                   e.message().unwrap_or("NO_MESSAGE")))
         },
+    }
+}
+
+// Some useful public functions
+// Name, Description
+pub fn provider_info(c: &dbus::Connection) -> Result<(String, String), String> {
+    let interface = "org.freedesktop.Geoclue";
+    let method    = "GetProviderInfo";
+    let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
+    let response  = blocking_send(c, msg)?;
+    match response.read2() {
+        Ok(data) => Ok(data),
+        Err(_) => Err(String::from("dbus::arg::TypeMismatchError (dbus::Message::read2())"))
+    }
+}
+
+// Name, Description, Service, Path
+pub fn addr_provider_info(c: &dbus::Connection) -> Result<(String, String, String, String), String> {
+    let interface = "org.freedesktop.Geoclue.MasterClient";
+    let method    = "GetAddressProvider";
+    let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
+    let response  = blocking_send(c, msg)?;
+    match response.read4() {
+        Ok(data) => Ok(data),
+        Err(_) => Err(String::from("dbus::arg::TypeMismatchError (dbus::Message::read4())"))
+    }
+}
+
+// Name, Description, Service, Path
+pub fn position_provider_info(c: &dbus::Connection) -> Result<(String, String, String, String), String> {
+    let interface = "org.freedesktop.Geoclue.MasterClient";
+    let method    = "GetPositionProvider";
+    let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
+    let response  = blocking_send(c, msg)?;
+    match response.read4() {
+        Ok(data) => Ok(data),
+        Err(_) => Err(String::from("dbus::arg::TypeMismatchError (dbus::Message::read4())"))
     }
 }
