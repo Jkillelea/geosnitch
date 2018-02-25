@@ -5,7 +5,7 @@ use dbus;
 
 const TIMEOUT: i32 = 10; // miliseconds?
 const DESTINATION: &'static str = "org.freedesktop.Geoclue.Master";
-const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client1";
+const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client2";
 // client0, 1, 2, or 3 on my computer. client0 doesn't seem to have the ability to get
 // position information, only address info. Aside from that, they all seem identical
 
@@ -58,6 +58,18 @@ impl Location {
             lat_lon: Some((lat, lon)),
         })
 
+    }
+
+    pub fn empty() -> Self {
+        Location {
+            country:     None,
+            postalcode:  None,
+            region:      None,
+            timezone:    None,
+            locality:    None,
+            countrycode: None,
+            lat_lon:     None,
+        }
     }
 
     // have serde produce a JSON string
@@ -137,4 +149,14 @@ pub fn position_provider_info(c: &dbus::Connection) -> Result<(String, String, S
         Ok(data) => Ok(data),
         Err(_) => Err(String::from("dbus::arg::TypeMismatchError (dbus::Message::read4())"))
     }
+}
+
+pub fn provider_name(c: &dbus::Connection) -> String {
+    provider_info(c).unwrap_or((String::new(), String::new())).0
+}
+pub fn addr_provider_name(c: &dbus::Connection) -> String {
+    addr_provider_info(c).unwrap_or((String::new(), String::new(), String::new(), String::new())).0
+}
+pub fn position_provider_name(c: &dbus::Connection) -> String {
+    position_provider_info(c).unwrap_or((String::new(), String::new(), String::new(), String::new())).0
 }
