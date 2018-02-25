@@ -9,7 +9,6 @@ const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client1";
 // client0, 1, 2, or 3 on my computer. client0 doesn't seem to have the ability to get
 // position information, only address info. Aside from that, they all seem identical
 
-
 #[derive(Debug, Serialize)]
 pub struct Location {            // Wrapping every field in Option makes it more flexible.
     country:     Option<String>, // Can encode it as JSON even if some fields are
@@ -24,13 +23,10 @@ pub struct Location {            // Wrapping every field in Option makes it more
 impl Location {
     // Query the D-Bus for address
     pub fn get_address(c: &dbus::Connection) -> Result<Self, String> {
-
         let interface = "org.freedesktop.Geoclue.Address";
-        let method = "GetAddress";
-        let msg = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
-
-        let response = blocking_send(c, msg)?;
-
+        let method    = "GetAddress";
+        let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
+        let response  = blocking_send(c, msg)?;
         // awkward argument parsing
         let (_time, mut location): (i32, HashMap<String, String>) = response.read2()
                                                                        .unwrap_or((0, HashMap::new()));
@@ -48,12 +44,10 @@ impl Location {
     // Query the D-Bus for position
     pub fn get_position(c: &dbus::Connection) -> Result<Self, String> {
         let interface = "org.freedesktop.Geoclue.Position";
-        let method = "GetPosition";
-
-        let msg = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
-        let response = blocking_send(c, msg)?;
+        let method    = "GetPosition";
+        let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
+        let response  = blocking_send(c, msg)?;
         let (_n, _t, lat, lon): (i32, i32, f64, f64) = response.read4().unwrap_or((0, 0, 0.0, 0.0));
-
         Ok(Location { // take values from the HashMap
             country:     None, // Option<String>
             postalcode:  None,
