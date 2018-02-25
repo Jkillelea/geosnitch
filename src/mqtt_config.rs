@@ -13,6 +13,15 @@ pub struct MqttConfig {
     pub topic: String,
 }
 
+/* 'path' should point to a file that looks like:
+{
+  "server":"server:port",
+  "username":"account_username", (optional)
+  "password":"account_password", (optional)
+  "client_id":"client_id",
+  "topic":"publish_topic"
+}
+*/
 pub fn get<P: convert::AsRef<Path>>(path: P) -> MqttConfig {
     let mut conf = String::new(); // read in config
     let mut conf_file = File::open(path).unwrap();
