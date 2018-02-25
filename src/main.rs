@@ -1,4 +1,4 @@
-use std::io::{Write};
+use std::io::Write;
 use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
@@ -41,7 +41,7 @@ fn main() {
         panic!("Failed to connect to server, return code {:?}", ack.connect_return_code());
     }
 
-    loop {
+    loop { // send location periodically
         buf.clear();
         let location = Location::get_address(&c).unwrap_or(Location::empty())
                                 .merge(Location::get_position(&c).unwrap_or(Location::empty()))
