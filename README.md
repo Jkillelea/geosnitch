@@ -1,4 +1,5 @@
-# Geosnitch
+# Geosnitch ![](https://travis-ci.org/Jkillelea/geosnitch.svg?branch=master)
+
 
 ### What is it?
 
