@@ -1,5 +1,3 @@
-use std::io::Write;
-use std::net::TcpStream;
 use std::thread;
 use std::time::Duration;
 
@@ -11,7 +9,6 @@ extern crate dbus;
 use dbus::*;
 
 extern crate mqtt;
-use mqtt::{Encodable};
 use mqtt::control::variable_header::ConnectReturnCode;
 
 mod mqtt_session;
@@ -23,7 +20,7 @@ use location::Location;
 fn main() {
     let c = Connection::get_private(BusType::Session).unwrap(); // D-Bus init
     println!("---");
-    println!("master provider: {}", location::provider_name(&c));
+    println!("master provider: {}",   location::provider_name(&c));
     println!("location provider: {}", location::addr_provider_name(&c));
     println!("position provider: {}", location::position_provider_name(&c));
     println!("---");
