@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::convert;
+use std::convert::AsRef;
 use std::path::Path;
 use std::io::prelude::*;
 use serde_json;
@@ -20,10 +20,11 @@ pub struct MqttConfig {
   "username":"account_username", (optional)
   "password":"account_password", (optional)
   "client_id":"client_id",
-  "topic":"publish_topic"
+  "topic":"publish_topic",
+  "send_period": 5
 }
 */
-pub fn get<P: convert::AsRef<Path>>(path: P) -> MqttConfig {
+pub fn get(path: &AsRef<Path>) -> MqttConfig {
     let mut conf = String::new(); // read in config
     let mut conf_file = File::open(path).unwrap();
     conf_file.read_to_string(&mut conf).unwrap();
