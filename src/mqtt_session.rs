@@ -32,8 +32,8 @@ impl MqttSession {
         send(&publish, &mut self.stream);
     }
 
-    pub fn read_ack(&mut self)
-        -> Result<ConnackPacket, mqtt::packet::PacketError<mqtt::packet::ConnackPacket>> {
+    pub fn read_ack(&mut self) -> Result<ConnackPacket,
+                                         mqtt::packet::PacketError<mqtt::packet::ConnackPacket>> {
         ConnackPacket::decode(&mut self.stream)
     }
 }
