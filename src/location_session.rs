@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use std::collections::HashMap;
 use dbus::{self, Connection, BusType};
-use location::{self, Location};
+use location::Location;
 
 const TIMEOUT: i32 = 20; // miliseconds?
 const DESTINATION: &'static str = "org.freedesktop.Geoclue.Master";

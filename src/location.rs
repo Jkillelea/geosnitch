@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 use std::collections::HashMap;
 use serde_json;
-use dbus;
 
 const TIMEOUT: i32 = 20; // miliseconds?
 const DESTINATION: &'static str = "org.freedesktop.Geoclue.Master";
