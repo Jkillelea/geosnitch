@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde_json;
 use dbus;
 
-const TIMEOUT: i32 = 10; // miliseconds?
+const TIMEOUT: i32 = 20; // miliseconds?
 const DESTINATION: &'static str = "org.freedesktop.Geoclue.Master";
 const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client2";
 // client0, 1, 2, or 3 on my computer. client0 doesn't seem to have the ability to get
@@ -28,8 +28,8 @@ impl Location {
         let msg       = dbus::Message::new_method_call(DESTINATION, PATH, interface, method)?;
         let response  = blocking_send(c, msg)?;
         // awkward argument parsing
-        let (_time, mut location): (i32, HashMap<String, String>) = response.read2()
-                                                                       .unwrap_or((0, HashMap::new()));
+        let (_time, mut location): (i32, HashMap<&str, String>) = response.read2()
+                                                                   .unwrap_or((0, HashMap::new()));
         Ok(Location { // take values out from the HashMap
             country:     location.remove("country"), // Option<String>
             postalcode:  location.remove("postalcode"),
@@ -151,6 +151,28 @@ pub fn position_provider_info(c: &dbus::Connection) -> Result<(String, String, S
     }
 }
 
+pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
+    fn client_props(c: &dbus::Connection, client: i32) -> String {
+        let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
+        let interface = "org.freedesktop.DBus.Introspectable";
+        let method    = "Introspect";
+        let msg       = dbus::Message::new_method_call(DESTINATION, path, interface, method).unwrap();
+        let response  = blocking_send(c, msg).unwrap();
+        let resp: String = response.read1().unwrap();
+        resp
+    }
+
+    let mut clients = Vec::new();
+    let res: Vec<bool> = (0 .. 255).map(|i| {
+        client_props(c, i).len() > 158 // 158 chars for an empty response. Large responses indicate
+    }).collect();                      // something is actually available. Yes, this is hacky af
+
+    for (i, avail) in res.iter().enumerate() {
+        if *avail { clients.push(i) }
+    }
+    clients // [0, 1, 2, ...]
+}
+
 pub fn provider_name(c: &dbus::Connection) -> String {
     provider_info(c).unwrap_or((String::new(), String::new())).0
 }
@@ -159,4 +181,16 @@ pub fn addr_provider_name(c: &dbus::Connection) -> String {
 }
 pub fn position_provider_name(c: &dbus::Connection) -> String {
     position_provider_info(c).unwrap_or((String::new(), String::new(), String::new(), String::new())).0
+}
+
+pub fn provider_status(c: &dbus::Connection, dest: &str, path: &str) -> Result<i32, String> {
+    let interface = "org.freedesktop.Geoclue";
+    let method    = "GetStatus";
+    let msg       = dbus::Message::new_method_call(dest, path, interface, method)?;
+    let response  = blocking_send(c, msg)?;
+    let resp: i32 = match response.read1() {
+        Ok(data) => data,
+        Err(_)   => {return Err(String::from("dbus::arg::TypeMismatchError (dbus::Message::read4())"))},
+    };
+    Ok(resp)
 }
