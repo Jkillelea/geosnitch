@@ -174,13 +174,16 @@ pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
 }
 
 pub fn provider_name(c: &dbus::Connection) -> String {
-    provider_info(c).unwrap_or((String::new(), String::new())).0
+    provider_info(c)
+        .unwrap_or((String::new(), String::new())).0
 }
 pub fn addr_provider_name(c: &dbus::Connection) -> String {
-    addr_provider_info(c).unwrap_or((String::new(), String::new(), String::new(), String::new())).0
+    addr_provider_info(c)
+        .unwrap_or((String::new(), String::new(), String::new(), String::new())).0
 }
 pub fn position_provider_name(c: &dbus::Connection) -> String {
-    position_provider_info(c).unwrap_or((String::new(), String::new(), String::new(), String::new())).0
+    position_provider_info(c)
+        .unwrap_or((String::new(), String::new(), String::new(), String::new())).0
 }
 
 pub fn provider_status(c: &dbus::Connection, dest: &str, path: &str) -> Result<i32, String> {
