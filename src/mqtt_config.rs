@@ -30,6 +30,5 @@ pub fn get(path: &AsRef<Path>) -> MqttConfig {
 
     conf_file.read_to_string(&mut conf).unwrap();
 
-    let conf: MqttConfig = serde_json::from_str(&conf).unwrap();
-    conf
+    serde_json::from_str(&conf).unwrap()
 }
