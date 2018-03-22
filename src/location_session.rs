@@ -16,10 +16,10 @@ impl LocationSession {
     // connect to the d bus and find the best client (last in the list)
     pub fn new() -> LocationSession {
         let conn       = Connection::get_private(BusType::Session).unwrap();
-        let client_num = available_clients(&conn).pop().unwrap();
+        let client_num = available_clients(&conn).pop().unwrap(); // always has at least client 0
 
         LocationSession {
-            connection: conn,
+            connection:  conn,
             client_path: format!("/org/freedesktop/Geoclue/Master/client{}", client_num),
         }
     }
@@ -54,7 +54,7 @@ impl LocationSession {
     }
 
     // -- misc things --
-    // Some useful public functions
+    // Some useful public functions.
     // Name, Description
     pub fn provider_info(&self) -> Result<(String, String), String> {
         let interface = "org.freedesktop.Geoclue";
@@ -100,6 +100,7 @@ impl LocationSession {
         }
     }
 
+    // basically the same things from above, but does all the error handling here so there's nice return types
     pub fn provider_name(&self) -> String {
         self.provider_info()
             .unwrap_or((String::new(), String::new())).0
