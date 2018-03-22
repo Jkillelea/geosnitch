@@ -20,7 +20,7 @@ pub struct Location {            // Wrapping every field in Option makes it more
 }
 
 impl Location {
-    pub fn empty() -> Self {
+    pub fn empty() -> Location {
         Location {
             country:     None,
             postalcode:  None,
@@ -38,7 +38,7 @@ impl Location {
     }
 
     // if the other struct contains a field, overwrite it in this struct
-    pub fn merge(mut self, other: Self) -> Self {
+    pub fn merge(mut self, other: Location) -> Location {
         if other.country.is_some() {
             self.country = other.country;
         }
@@ -63,7 +63,7 @@ impl Location {
         self
     }
 
-    pub fn from_location_hashmap(mut location: HashMap<&str, String>) -> Self {
+    pub fn from_location_hashmap(mut location: HashMap<&str, String>) -> Location {
         Location {
             country:     location.remove("country"), // Option<String>
             postalcode:  location.remove("postalcode"),
@@ -75,7 +75,7 @@ impl Location {
         }
     }
 
-    pub fn from_lat_lon(lat: f64, lon: f64) -> Self {
+    pub fn from_lat_lon(lat: f64, lon: f64) -> Location {
         Location { // take values from the HashMap
             country:     None, // Option<String>
             postalcode:  None,
