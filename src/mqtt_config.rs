@@ -6,12 +6,12 @@ use serde_json;
 
 #[derive(Debug, Deserialize)]
 pub struct MqttConfig {
-    pub server: String,           // server name:port
-    pub username: Option<String>, // login username
-    pub password: Option<String>, // login password
-    pub client_id: String,        // MQTT client ID
-    pub topic: String,            // MQTT topic
-    pub send_period: Option<u64>, // send every $(send_period) seconds
+    pub server:      String,         // server name:port
+    pub username:    Option<String>, // login username
+    pub password:    Option<String>, // login password
+    pub client_id:   String,         // MQTT client ID
+    pub topic:       String,         // MQTT topic
+    pub send_period: Option<u64>,    // send every send_period seconds
 }
 
 /* 'path' should point to a file that looks like:
@@ -25,9 +25,11 @@ pub struct MqttConfig {
 }
 */
 pub fn get(path: &AsRef<Path>) -> MqttConfig {
-    let mut conf = String::new(); // read in config
+    let mut conf      = String::new(); // read in config
     let mut conf_file = File::open(path).unwrap();
+
     conf_file.read_to_string(&mut conf).unwrap();
+
     let conf: MqttConfig = serde_json::from_str(&conf).unwrap();
     conf
 }

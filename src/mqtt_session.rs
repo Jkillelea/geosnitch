@@ -38,7 +38,6 @@ impl MqttSession {
     }
 }
 
-
 fn send<'a, Pack: Encodable<'a>>(packet: &'a Pack, stream: &mut TcpStream) {
     let mut buf = Vec::new();
     packet.encode(&mut buf).unwrap();
