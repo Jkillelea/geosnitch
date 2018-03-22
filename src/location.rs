@@ -8,11 +8,6 @@ const PATH: &'static str = "/org/freedesktop/Geoclue/Master/client2";
 // client0, 1, 2, or 3 on my computer. client0 doesn't seem to have the ability to get
 // position information, only address info. Aside from that, they all seem identical
 
-#[derive(Debug)]
-pub struct LocationSession {
-
-}
-
 #[derive(Debug, Serialize)]
 pub struct Location {            // Wrapping every field in Option makes it more flexible.
     country:     Option<String>, // Can encode it as JSON even if some fields are
@@ -92,4 +87,3 @@ impl Location {
         }
     }
 }
-
