@@ -53,7 +53,7 @@ impl LocationSession {
         Ok(Location::from_lat_lon(lat, lon))
     }
 
-    // -- misc things -- 
+    // -- misc things --
     // Some useful public functions
     // Name, Description
     pub fn provider_info(&self) -> Result<(String, String), String> {
@@ -141,7 +141,7 @@ fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Messa
 }
 
 pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
-    fn client_props(c: &dbus::Connection, client: i32) -> String {
+    fn client_props(c: &dbus::Connection, client: i32) -> String { // nested function
         let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
         let interface = "org.freedesktop.DBus.Introspectable";
         let method    = "Introspect";
@@ -161,4 +161,3 @@ pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
     }
     clients // [0, 1, 2, ...]
 }
-
