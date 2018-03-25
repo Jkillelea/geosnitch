@@ -196,5 +196,6 @@ pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
     for (i, avail) in res.iter().enumerate() {
         if *avail { clients.push(i) }
     }
+    debug!("Availble client numbers: {:?}", clients);
     clients // [0, 1, 2, ...]
 }
