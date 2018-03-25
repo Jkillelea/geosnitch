@@ -25,10 +25,13 @@ pub struct MqttConfig {
 }
 */
 pub fn get(path: &AsRef<Path>) -> MqttConfig {
+    trace!("mqtt_config::get");
     let mut conf      = String::new(); // read in config
     let mut conf_file = File::open(path).unwrap();
 
     conf_file.read_to_string(&mut conf).unwrap();
+
+    debug!("Mqtt credientials: {}", conf);
 
     serde_json::from_str(&conf).unwrap()
 }

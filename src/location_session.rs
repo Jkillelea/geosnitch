@@ -15,6 +15,7 @@ pub struct LocationSession {
 impl LocationSession {
     // connect to the d bus and find the best client (last in the list)
     pub fn new() -> LocationSession {
+        trace!("location_session::LocationSession::new");
         let conn       = Connection::get_private(BusType::Session).unwrap();
         let client_num = available_clients(&conn).pop().unwrap(); // always has at least client 0
 
@@ -26,6 +27,7 @@ impl LocationSession {
 
     // Query the D-Bus for address
     pub fn get_address(&self) -> Result<Location, String> {
+        trace!("location_session::LocationSession::get_address");
         let interface = "org.freedesktop.Geoclue.Address";
         let method    = "GetAddress";
         let msg       = dbus::Message::new_method_call(DESTINATION,
@@ -41,6 +43,7 @@ impl LocationSession {
 
     // Query the D-Bus for position
     pub fn get_position(&self) -> Result<Location, String> {
+        trace!("location_session::LocationSession::get_position");
         let interface = "org.freedesktop.Geoclue.Position";
         let method    = "GetPosition";
         let msg       = dbus::Message::new_method_call(DESTINATION,
@@ -53,10 +56,36 @@ impl LocationSession {
         Ok(Location::from_lat_lon(lat, lon))
     }
 
+    pub fn address_start(&self) -> Result<(), String> {
+        trace!("location_session::LocationSession::address_start");
+        let interface = "org.freedesktop.Geoclue.MasterClient";
+        let method    = "AddressStart";
+        let msg       = dbus::Message::new_method_call(DESTINATION,
+                                                       &self.client_path,
+                                                       interface,
+                                                       method)?;
+        blocking_send(&self.connection, msg)?;
+        Ok(())
+    }
+
+    pub fn position_start(&self) -> Result<(), String> {
+        trace!("location_session::LocationSession::position_start");
+        let interface = "org.freedesktop.Geoclue.MasterClient";
+        let method    = "PositionStart";
+        let msg       = dbus::Message::new_method_call(DESTINATION,
+                                                       &self.client_path,
+                                                       interface,
+                                                       method)?;
+        blocking_send(&self.connection, msg)?;
+        Ok(())
+    }
+
+
     // -- misc things --
     // Some useful public functions.
     // Name, Description
     pub fn provider_info(&self) -> Result<(String, String), String> {
+        trace!("location_session::LocationSession::provider_info");
         let interface = "org.freedesktop.Geoclue";
         let method    = "GetProviderInfo";
         let msg       = dbus::Message::new_method_call(DESTINATION,
@@ -72,6 +101,7 @@ impl LocationSession {
 
     // Name, Description, Service, Path
     pub fn addr_provider_info(&self) -> Result<(String, String, String, String), String> {
+        trace!("location_session::LocationSession::addr_provider_info");
         let interface = "org.freedesktop.Geoclue.MasterClient";
         let method    = "GetAddressProvider";
         let msg       = dbus::Message::new_method_call(DESTINATION,
@@ -87,6 +117,7 @@ impl LocationSession {
 
     // Name, Description, Service, Path
     pub fn position_provider_info(&self) -> Result<(String, String, String, String), String> {
+        trace!("location_session::LocationSession::position_provider_info");
         let interface = "org.freedesktop.Geoclue.MasterClient";
         let method    = "GetPositionProvider";
         let msg       = dbus::Message::new_method_call(DESTINATION,
@@ -117,6 +148,7 @@ impl LocationSession {
     }
 
     pub fn provider_status(&self, dest: &str, path: &str) -> Result<i32, String> {
+        trace!("location_session::LocationSession::provider_status");
         let interface = "org.freedesktop.Geoclue";
         let method    = "GetStatus";
         let msg       = dbus::Message::new_method_call(dest, path, interface, method)?;
@@ -132,6 +164,7 @@ impl LocationSession {
 }
 
 fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Message, String> {
+    trace!("location_session::blocking_send");
     match c.send_with_reply_and_block(msg, TIMEOUT) {
         Ok(r)  => Ok(r),
         Err(e) => { // convert to the same error type as Message::new_method_call could return
@@ -141,7 +174,10 @@ fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Messa
     }
 }
 
+// query each possible client on the D-Bus to see if it responds
 pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
+    trace!("location_session::available_clients");
+    debug!("location_session::available_clients: Using response length > 158 chars -> client available");
     fn client_props(c: &dbus::Connection, client: i32) -> String { // nested function
         let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
         let interface = "org.freedesktop.DBus.Introspectable";

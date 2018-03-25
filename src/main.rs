@@ -2,6 +2,10 @@ use std::thread;
 use std::time::Duration;
 
 #[macro_use]
+extern crate log;
+extern crate env_logger;
+
+#[macro_use]
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
@@ -18,20 +22,31 @@ use location::Location;
 use location_session::LocationSession;
 
 fn main() {
-    let session = LocationSession::new();
+    env_logger::init();
 
-    let providers = ["Geonames", "Localnet", "Skyhook", "UbuntuGeoIP"];
-    for p in providers.iter() {
-        let dest = format!("org.freedesktop.Geoclue.Providers.{}", p);
-        let path = format!("/org/freedesktop/Geoclue/Providers/{}", p);
-        println!("{}: {:#?}", p, session.provider_status(&dest, &path));
+    let session = LocationSession::new();
+    if session.address_start().is_err() {
+        debug!("Address provider already started");
+    } else {
+        debug!("Address provider started");
+    }
+    if session.position_start().is_err() {
+        debug!("Position provider already started");
+    } else {
+        debug!("Position provider started");
     }
 
-    println!("---");
-    println!("master provider: {}",   session.provider_name());
-    println!("location provider: {}", session.addr_provider_name());
-    println!("position provider: {}", session.position_provider_name());
-    println!("---");
+    // let providers = ["Geonames", "Localnet", "Skyhook", "UbuntuGeoIP"];
+    // for p in providers.iter() {
+    //     let dest = format!("org.freedesktop.Geoclue.Providers.{}", p);
+    //     let path = format!("/org/freedesktop/Geoclue/Providers/{}", p);
+    //     info!("{}: {:#?}", p, session.provider_status(&dest, &path));
+    // }
+    info!("---");
+    info!("master provider: {}",   session.provider_name());
+    info!("location provider: {}", session.addr_provider_name());
+    info!("position provider: {}", session.position_provider_name());
+    info!("---");
 
     let conf = mqtt_config::get(&"mqtt-auth.json"); // this file is not in version control
     let mut mqtt_session = MqttSession::new(conf.server);
@@ -41,6 +56,7 @@ fn main() {
     assert_eq!(ack.connect_return_code(), ConnectReturnCode::ConnectionAccepted);
 
     loop { // send location periodically
+        trace!("Main Loop");
         let location = session.get_address()
                               .unwrap_or(Location::empty())
                               .merge(session.get_position()
@@ -51,5 +67,4 @@ fn main() {
         thread::sleep(Duration::from_secs(conf.send_period.unwrap_or(10)));
     }
 }
-
 
