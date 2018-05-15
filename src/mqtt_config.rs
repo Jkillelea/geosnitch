@@ -25,7 +25,7 @@ pub struct MqttConfig {
 }
 */
 pub fn get(path: &AsRef<Path>) -> MqttConfig {
-    trace!("mqtt_config::get");
+    trace!("get");
     let mut conf      = String::new(); // read in config
     let mut conf_file = File::open(path).unwrap();
 

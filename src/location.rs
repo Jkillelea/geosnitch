@@ -28,13 +28,13 @@ impl Location {
 
     // have serde produce a JSON string
     pub fn as_json(&self) -> Result<String, serde_json::Error> {
-        trace!("location::Location::as_json");
+        trace!("Location::as_json");
         serde_json::to_string(self)
     }
 
     // if the other struct contains a field, overwrite it in this struct
     pub fn merge(mut self, other: Location) -> Location {
-        trace!("location::Location::merge");
+        trace!("Location::merge");
         if other.country.is_some() {
             self.country = other.country;
         }
@@ -60,7 +60,7 @@ impl Location {
     }
 
     pub fn from_location_hashmap(mut location: HashMap<&str, String>) -> Location {
-        trace!("location::Location::from_location_hashmap");
+        trace!("Location::from_location_hashmap");
         Location {
             country:     location.remove("country"), // Option<String>
             postalcode:  location.remove("postalcode"),
@@ -73,7 +73,7 @@ impl Location {
     }
 
     pub fn from_lat_lon(lat: f64, lon: f64) -> Location {
-        trace!("location::Location::from_lat_lon");
+        trace!("Location::from_lat_lon");
         Location { // take values from the HashMap
             country:     None, // Option<String>
             postalcode:  None,
