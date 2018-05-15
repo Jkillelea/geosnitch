@@ -189,6 +189,9 @@ pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
     debug!("location_session::available_clients: Using response length > {} chars -> client available",
         minimum_chars_in_response);
     debug!("Availble client numbers: {:?}", clients);
+
+    if clients.len() == 0 { warn!("Found zero location service clients!") }
+
     clients // [0, 1, 2, ...]
 }
 
