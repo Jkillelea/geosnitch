@@ -17,7 +17,7 @@ impl LocationSession {
     pub fn new() -> LocationSession {
         trace!("location_session::LocationSession::new");
         let conn       = Connection::get_private(BusType::Session).unwrap();
-        let client_num = available_clients(&conn).pop().unwrap(); // always has at least client 0
+        let client_num = available_clients(&conn).pop().unwrap_or(0); // always has at least client 0
 
         LocationSession {
             connection:  conn,
@@ -177,26 +177,32 @@ fn blocking_send(c: &dbus::Connection, msg: dbus::Message) -> Result<dbus::Messa
 // query each possible client on the D-Bus to see if it responds
 pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
     trace!("location_session::available_clients");
-    debug!("location_session::available_clients: Using response length > 158 chars -> client available");
-    fn client_props(c: &dbus::Connection, client: i32) -> String { // nested function
-        trace!("location_session::client_props");
-        let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
-        let interface = "org.freedesktop.DBus.Introspectable";
-        let method    = "Introspect";
-        let msg       = dbus::Message::new_method_call(DESTINATION, path, interface, method).unwrap();
-        let response  = blocking_send(&c, msg).unwrap();
-        let resp: String = response.read1().unwrap();
-        resp
-    }
-
     let mut clients = Vec::new();
-    let res: Vec<bool> = (0 .. 255).map(|i| {
-        client_props(c, i).len() > 158 // 158 chars for an empty response. Large responses indicate
-    }).collect();                      // something is actually available. Yes, this is hacky af
+    let minimum_chars_in_response = 158;
+    let res: Vec<bool> = (0 .. 10).map(|i| {
+        client_props(c, i).len() > minimum_chars_in_response // 158 chars for an empty response. Large responses indicate
+    }).collect();                                            // something is actually available. Yes, this is hacky af
 
     for (i, avail) in res.iter().enumerate() {
         if *avail { clients.push(i) }
     }
+    debug!("location_session::available_clients: Using response length > {} chars -> client available",
+        minimum_chars_in_response);
     debug!("Availble client numbers: {:?}", clients);
+
+    if clients.len() == 0 { warn!("Found zero location service clients!") }
+
     clients // [0, 1, 2, ...]
+}
+
+// Call introspect method, basically see if somebody is home
+fn client_props(c: &dbus::Connection, client: i32) -> String {
+    trace!("");
+    let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
+    let interface = "org.freedesktop.DBus.Introspectable";
+    let method    = "Introspect";
+    let msg       = dbus::Message::new_method_call(DESTINATION, path, interface, method).unwrap();
+    let response  = blocking_send(&c, msg).unwrap();
+    let resp: String = response.read1().unwrap();
+    resp
 }
