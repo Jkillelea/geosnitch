@@ -179,6 +179,7 @@ pub fn available_clients(c: &dbus::Connection) -> Vec<usize> {
     trace!("location_session::available_clients");
     debug!("location_session::available_clients: Using response length > 158 chars -> client available");
     fn client_props(c: &dbus::Connection, client: i32) -> String { // nested function
+        trace!("location_session::client_props");
         let path      = format!("/org/freedesktop/Geoclue/Master/client{}", client);
         let interface = "org.freedesktop.DBus.Introspectable";
         let method    = "Introspect";
