@@ -46,10 +46,48 @@ impl<'a> GeoClue2<'a> {
                 timeout
             };
 
+        client.start().unwrap();
+        
         GeoClue2 { 
             connection, 
             manager,
             client,
         }
+    }
+
+    pub fn add_agent(&self, id: &str) -> Result<(), dbus::Error> {
+        return self.manager.add_agent(id)
+    }
+
+    pub fn get_in_use(&self) -> Result<bool, dbus::Error> {
+        return self.manager.get_in_use()
+    }
+
+    pub fn get_available_accuracy_level(&self, id: &str) -> Result<u32, dbus::Error> {
+        return self.manager.get_available_accuracy_level()
+    }
+
+    pub fn get_latitude(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_latitude()
+    }
+
+    pub fn get_longitude(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_longitude()
+    }
+    
+    pub fn get_accuracy(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_accuracy()
+    }
+    
+    pub fn get_altitude(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_altitude()
+    }
+    
+    pub fn get_speed(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_speed()
+    }
+    
+    pub fn get_heading(&self) -> Result<f64, dbus::Error> {
+        return self.client.get_heading()
     }
 }
