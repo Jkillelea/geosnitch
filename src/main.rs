@@ -31,9 +31,8 @@ fn main() {
 
     let manager = geoclue2::GeoClue2::new();
     println!("{:#?}", manager);
-    println!("{:#?}", manager.get_latitude());
-    println!("{:#?}", manager.get_longitude());
-    println!("{:#?}", manager.get_altitude());
+    println!("{:#?}", manager.get_in_use());
+    println!("{:#?}", manager.get_available_accuracy_level());
     return;
 
     let session = LocationSession::new();

@@ -68,27 +68,4 @@ impl<'a> GeoClue2<'a> {
         return self.manager.get_available_accuracy_level()
     }
 
-    pub fn get_latitude(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_latitude()
-    }
-
-    pub fn get_longitude(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_longitude()
-    }
-    
-    pub fn get_accuracy(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_accuracy()
-    }
-    
-    pub fn get_altitude(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_altitude()
-    }
-    
-    pub fn get_speed(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_speed()
-    }
-    
-    pub fn get_heading(&self) -> Result<f64, dbus::Error> {
-        return self.client.get_heading()
-    }
 }
