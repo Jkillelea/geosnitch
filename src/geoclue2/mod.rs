@@ -46,8 +46,9 @@ impl<'a> GeoClue2<'a> {
                 timeout
             };
 
+        client.set_desktop_id("desktop".into()).unwrap();
         client.start().unwrap();
-        
+
         GeoClue2 { 
             connection, 
             manager,
@@ -63,7 +64,7 @@ impl<'a> GeoClue2<'a> {
         return self.manager.get_in_use()
     }
 
-    pub fn get_available_accuracy_level(&self, id: &str) -> Result<u32, dbus::Error> {
+    pub fn get_available_accuracy_level(&self) -> Result<u32, dbus::Error> {
         return self.manager.get_available_accuracy_level()
     }
 
