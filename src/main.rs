@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 use std::thread;
 use std::time::Duration;
 
@@ -21,8 +23,14 @@ use mqtt_session::MqttSession;
 use location::Location;
 use location_session::LocationSession;
 
+mod geoclue2;
+mod geoclue2_sys;
+
 fn main() {
     env_logger::init();
+
+    geoclue2::GeoClue2::new();
+    return;
 
     let session = LocationSession::new();
     if session.address_start().is_err() {
