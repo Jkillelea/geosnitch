@@ -24,12 +24,14 @@ use location::Location;
 use location_session::LocationSession;
 
 mod geoclue2;
-mod geoclue2_sys;
+// mod geoclue2_sys;
 
 fn main() {
     env_logger::init();
 
-    geoclue2::GeoClue2::new();
+    let manager = geoclue2::GeoClue2::new();
+    println!("{:#?}", manager);
+    
     return;
 
     let session = LocationSession::new();
